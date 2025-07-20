@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # OpenFGA Server
+  openfga:
+    image: openfga/openfga:v1.9.0
+    container_name: openfga_server
+    command: run --playground-enabled
+    ports:
+      - "8080:8080"  # API
+      - "8888:8888"  # Playground
+      - "3001:3001"  # Metrics
+    environment:
+      - OPENFGA_PLAYGROUND_ENABLED=true
+      - OPENFGA_PLAYGROUND_PORT=8888
+      - OPENFGA_HTTP_ADDR=0.0.0.0:8080
+    volumes:
+      - openfga_data:/tmp
+    networks:
+      - openfga_network
+
+  # FastAPI Application
+  fastapi-app:
+    build: .
+    container_name: fastapi_openfga_app
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENFGA_API_URL=http://openfga:8080
+      - DATABASE_URL=sqlite:///./app.db
+    volumes:
+      - ./app:/app
+      - ./app.db:/app/app.db
+    depends_on:
+      - openfga
+    networks:
+      - openfga_network
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  openfga_data:
+
+networks:
+  openfga_network:
+    driver: bridge
