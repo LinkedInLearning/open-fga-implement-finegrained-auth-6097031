@@ -1,37 +1,55 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-# Database URL
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./app.db")
-ASYNC_DATABASE_URL = DATABASE_URL.replace("sqlite://", "sqlite+aiosqlite://")
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import Column, String, DateTime, Text
+from datetime import datetime
+from app.config import settings
 
 # Create async engine
-async_engine = create_async_engine(
-    ASYNC_DATABASE_URL,
-    echo=True,
-    future=True
+engine = create_async_engine(
+    settings.database_url,
+    echo=settings.debug,  # Log SQL queries in debug mode
 )
 
-# Create async session
-AsyncSessionLocal = sessionmaker(
-    bind=async_engine,
+# Create async session factory
+AsyncSessionLocal = async_sessionmaker(
+    engine,
     class_=AsyncSession,
     expire_on_commit=False
 )
 
-# Base class for models
-Base = declarative_base()
+class Base(DeclarativeBase):
+    """Base class for all database models."""
+    pass
 
-# Dependency to get database session
+# SQLAlchemy Models
+class OrganizationDB(Base):
+    __tablename__ = "organizations"
+    
+    id = Column(String, primary_key=True, index=True)
+    name = Column(String, nullable=False, index=True)
+    description = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class DocumentDB(Base):
+    __tablename__ = "documents"
+    
+    id = Column(String, primary_key=True, index=True)
+    name = Column(String, nullable=False, index=True)
+    description = Column(Text, nullable=True)
+    organization_id = Column(String, nullable=False, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+# Database dependency
 async def get_db():
+    """Dependency to get database session."""
     async with AsyncSessionLocal() as session:
         try:
             yield session
         finally:
             await session.close()
+
+# Database initialization
+async def init_db():
+    """Initialize database tables."""
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)

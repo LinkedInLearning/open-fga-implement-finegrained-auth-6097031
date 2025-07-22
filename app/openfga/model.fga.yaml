@@ -1,0 +1,106 @@
+model: |
+  model
+    schema 1.1
+
+  type user
+
+  type organization
+    relations
+      define admin: [user]
+      define member: [user]
+      define viewer: [user]
+      
+      # Permisos organizacionales
+      define can_add_member: admin
+      define can_delete_member: admin  
+      define can_view_members: admin or member or viewer
+
+  type document
+    relations
+      define organization: [organization]
+      define owner: [user]
+      
+      # Mapear permisos de documento a roles organizacionales
+      define can_read: owner or admin from organization or member from organization or viewer from organization
+      define can_write: owner or admin from organization or member from organization
+      define can_delete: owner or admin from organization
+
+tuples:
+  - user: user:alice
+    relation: admin
+    object: organization:tech-company
+  - user: user:bob
+    relation: member
+    object: organization:tech-company
+  - user: user:charlie
+    relation: viewer
+    object: organization:tech-company
+  - user: user:diana
+    relation: member
+    object: organization:marketing-dept
+  - user: organization:tech-company
+    relation: organization
+    object: document:technical-specs
+  - user: organization:tech-company
+    relation: organization
+    object: document:company-handbook
+  - user: organization:marketing-dept
+    relation: organization
+    object: document:marketing-plan
+  - user: user:alice
+    relation: owner
+    object: document:personal-notes
+  - user: organization:tech-company
+    relation: organization
+    object: document:personal-notes
+
+tests:
+  - check:
+    # Permisos por roles organizacionales:
+    - user: user:alice
+      object: document:company-handbook
+      assertions:
+        can_read: true
+    - user: user:bob
+      object: document:technical-specs
+      assertions:
+        can_write: true
+    - user: user:charlie
+      object: document:company-handbook
+      assertions:
+        can_write: false 
+    - user: user:diana
+      object: document:company-handbook
+      assertions:
+        can_read: false
+    # Permisos por propiedad individual:
+    - user: user:alice
+      object: document:personal-notes
+      assertions:
+        can_read: true
+        can_write: true
+        can_delete: true
+    - user: user:bob
+      object: document:personal-notes
+      assertions:
+        can_read: true
+        can_write: true
+    - user: user:charlie
+      object: document:personal-notes
+      assertions:
+        can_read: true
+        can_write: false
+    # Permisos organizacionales:
+    - user: user:alice
+      object: organization:tech-company
+      assertions:
+        can_add_member: true
+    - user: user:bob
+      object: organization:tech-company
+      assertions:
+        can_add_member: false
+    - user: user:bob
+      object: organization:tech-company
+      assertions:
+        can_view_members: true
+
