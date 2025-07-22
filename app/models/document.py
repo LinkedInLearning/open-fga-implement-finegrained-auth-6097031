@@ -6,6 +6,8 @@ class DocumentBase(BaseModel):
     title: str = Field(..., min_length=1, max_length=255)
     content: Optional[str] = None
 
+    is_public: bool = Field(default=False, description="Documento es publico o no")
+
 class DocumentCreate(DocumentBase):
     organization_id: str
     owner_id: Optional[str] = None
@@ -13,6 +15,7 @@ class DocumentCreate(DocumentBase):
 class DocumentUpdate(BaseModel):
     title: Optional[str] = Field(None, min_length=1, max_length=255)
     content: Optional[str] = None
+    is_public: Optional[bool] = None
 
 class Document(DocumentBase):
     id: str
@@ -32,4 +35,3 @@ class DocumentPermissions(BaseModel):
     can_read: bool
     can_write: bool
     can_delete: bool
-    can_share: bool
