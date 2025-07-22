@@ -1,6 +1,6 @@
 model: |
-  model
-    schema 1.1
+  model 
+  schema 1.1
 
   type user
 
@@ -9,21 +9,25 @@ model: |
       define admin: [user]
       define member: [user]
       define viewer: [user]
-      
-      # Permisos organizacionales
+
       define can_add_member: admin
-      define can_delete_member: admin  
-      define can_view_members: admin or member or viewer
+      define can_delete_member: admin
+      define can_view_member: admin or member
+      define can_add_document: admin or member
 
   type document
     relations
       define organization: [organization]
-      define owner: [user]
       
-      # Mapear permisos de documento a roles organizacionales
-      define can_read: owner or admin from organization or member from organization or viewer from organization
-      define can_write: owner or admin from organization or member from organization
-      define can_delete: owner or admin from organization
+      # Roles específicos del documento
+      define owner: [user]
+      define editor: [user]
+      define viewer: [user]
+
+      # Permisos que combinan roles organizacionales Y específicos del documento
+      define can_read: viewer or editor or owner or member from organization or admin from organization
+      define can_write: editor or owner or admin from organization
+      define can_delete: owner or admin from organization      
 
 tuples:
   - user: user:alice
@@ -53,6 +57,24 @@ tuples:
   - user: organization:tech-company
     relation: organization
     object: document:personal-notes
+  - user: user:bob
+    relation: owner
+    object: document:project-plan
+  - user: user:charlie
+    relation: editor
+    object: document:project-plan
+  - user: user:alice
+    relation: owner
+    object: document:confidential-report
+  - user: user:bob
+    relation: viewer
+    object: document:confidential-report
+  - user: user:bob
+    relation: owner
+    object: document:company-handbook
+  - user: user:charlie
+    relation: viewer
+    object: document:company-handbook
 
 tests:
   - check:
@@ -64,7 +86,8 @@ tests:
     - user: user:bob
       object: document:technical-specs
       assertions:
-        can_write: true
+        can_write: false
+        can_read: true
     - user: user:charlie
       object: document:company-handbook
       assertions:
@@ -83,12 +106,12 @@ tests:
     - user: user:bob
       object: document:personal-notes
       assertions:
-        can_read: true
-        can_write: true
+        can_read: true # because member of organization
+        can_write: false
     - user: user:charlie
       object: document:personal-notes
       assertions:
-        can_read: true
+        can_read: false # not a member of the organization
         can_write: false
     # Permisos organizacionales:
     - user: user:alice
@@ -102,5 +125,28 @@ tests:
     - user: user:bob
       object: organization:tech-company
       assertions:
-        can_view_members: true
-
+        can_view_member: true
+    - user: user:bob
+      object: document:project-plan
+      assertions:
+        owner: true
+    - user: user:charlie
+      object: document:project-plan
+      assertions:
+        editor: true
+    - user: user:alice
+      object: document:confidential-report
+      assertions:
+        owner: true
+    - user: user:bob
+      object: document:confidential-report
+      assertions:
+        viewer: true
+    - user: user:bob
+      object: document:company-handbook
+      assertions:
+        owner: true
+    - user: user:charlie
+      object: document:company-handbook
+      assertions: 
+        viewer: true

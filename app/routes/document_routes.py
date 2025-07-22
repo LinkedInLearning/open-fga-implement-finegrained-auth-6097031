@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from app.models.document import Document, DocumentCreate, DocumentUpdate
+from app.models.document import *
 from app.database import get_db, DocumentDB
 from app.services.authorization_service import authz_service
 
@@ -31,9 +31,8 @@ async def list_documents(
         if await authz_service.can_view_document(user_id, document.id):
             accessible_documents.append(Document(
                 id=document.id,
-                name=document.name,
+                title=document.title,
                 description=document.description,
-                document_type=document.document_type,
                 organization_id=document.organization_id,
                 created_at=document.created_at
             ))
@@ -58,9 +57,8 @@ async def get_document(
     
     return Document(
         id=document_db.id,
-        name=document_db.name,
+        title=document_db.title,
         description=document_db.description,
-        document_type=document_db.document_type,
         organization_id=document_db.organization_id,
         created_at=document_db.created_at
     )
@@ -80,9 +78,7 @@ async def create_document(
     # Create document in database
     document_db = DocumentDB(
         id=document_id,
-        name=document.name,
-        description=document.description,
-        document_type=document.document_type,
+        title=document.title,
         organization_id=document.organization_id,
         created_at=datetime.now()
     )
@@ -94,11 +90,18 @@ async def create_document(
     # Link document to organization in OpenFGA
     await authz_service.assign_document_to_organization(document_id, document.organization_id)
     
+    success = await authz_service.assign_document_role(
+        user_id, 
+        document_id, 
+        "owner"
+    )
+    
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to assign role")
+
     return Document(
         id=document_db.id,
-        name=document_db.name,
-        description=document_db.description,
-        document_type=document_db.document_type,
+        title=document_db.title,
         organization_id=document_db.organization_id,
         created_at=document_db.created_at
     )
@@ -130,9 +133,7 @@ async def update_document(
     
     return Document(
         id=document_db.id,
-        name=document_db.name,
-        description=document_db.description,
-        document_type=document_db.document_type,
+        title=document_db.title,
         organization_id=document_db.organization_id,
         created_at=document_db.created_at
     )
@@ -158,26 +159,81 @@ async def delete_document(
     
     return {"message": "Resource deleted successfully"}
 
-@router.get("/{document_id}/permissions")
+@router.post("/{document_id}/roles")
+async def assign_document_role(
+    document_id: str,
+    role_assignment: DocumentRoleAssignment,
+    user_id: str = Query(..., description="User ID for authorization"),
+    db: AsyncSession = Depends(get_db)
+):
+    """Assign a role to a user on a specific document (requires can_share permission)."""
+    if not await authz_service.can_share_document(user_id, document_id):
+        raise HTTPException(status_code=403, detail="Share access required")
+    
+    # Check if document exists
+    result = await db.execute(select(DocumentDB).where(DocumentDB.id == document_id))
+    if not result.scalar_one_or_none():
+        raise HTTPException(status_code=404, detail="Document not found")
+    
+    success = await authz_service.assign_document_role(
+        role_assignment.user_id, 
+        document_id, 
+        role_assignment.role
+    )
+    
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to assign role")
+    
+    return {
+        "message": f"User {role_assignment.user_id} assigned as {role_assignment.role}",
+        "document_id": document_id,
+        "user_id": role_assignment.user_id,
+        "role": role_assignment.role
+    }
+
+@router.delete("/{document_id}/roles/{target_user_id}")
+async def remove_document_role(
+    document_id: str,
+    target_user_id: str,
+    role: str = Query(..., description="Role to remove ('owner', 'editor', or 'viewer')"),
+    user_id: str = Query(..., description="User ID for authorization"),
+    db: AsyncSession = Depends(get_db)
+):
+    """Remove a role from a user on a specific document (requires can_share permission)."""
+    if not await authz_service.can_share_document(user_id, document_id):
+        raise HTTPException(status_code=403, detail="Share access required")
+    
+    # Check if document exists
+    result = await db.execute(select(DocumentDB).where(DocumentDB.id == document_id))
+    if not result.scalar_one_or_none():
+        raise HTTPException(status_code=404, detail="Document not found")
+    
+    success = await authz_service.remove_document_role(target_user_id, document_id, role)
+    
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to remove role")
+    
+    return {"message": f"User {target_user_id} removed from {role} role"}
+
+@router.get("/{document_id}/permissions", response_model=DocumentPermissions)
 async def check_document_permissions(
     document_id: str,
     user_id: str = Query(..., description="User ID to check permissions for"),
     db: AsyncSession = Depends(get_db)
 ):
     """Check what permissions a user has on a specific document."""
-    result = await db.execute(select(ResourceDB).where(ResourceDB.id == document_id))
+    result = await db.execute(select(DocumentDB).where(DocumentDB.id == document_id))
     document_db = result.scalar_one_or_none()
     
     if not document_db:
-        raise HTTPException(status_code=404, detail="Resource not found")
+        raise HTTPException(status_code=404, detail="Document not found")
     
-    permissions = {
-        "can_view": await authz_service.can_view_document(user_id, document_id),
-        "can_delete": await authz_service.can_delete_document(user_id, document_id)
-    }
+    permissions = DocumentPermissions(
+        user_id=user_id,
+        document_id=document_id,
+        can_read=await authz_service.can_read_document(user_id, document_id),
+        can_write=await authz_service.can_write_document(user_id, document_id),
+        can_delete=await authz_service.can_delete_document(user_id, document_id)
+    )
     
-    return {
-        "document_id": document_id,
-        "user_id": user_id,
-        "permissions": permissions
-    }
+    return permissions
