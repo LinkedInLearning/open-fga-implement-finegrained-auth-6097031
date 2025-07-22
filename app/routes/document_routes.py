@@ -81,6 +81,7 @@ async def create_document(
         id=document_id,
         title=document.title,
         organization_id=document.organization_id,
+        is_public=document.is_public,
         created_at=datetime.now()
     )
     
@@ -91,19 +92,15 @@ async def create_document(
     # Link document to organization in OpenFGA
     await authz_service.assign_document_to_organization(document_id, document.organization_id)
     
-    success = await authz_service.assign_document_role(
-        user_id, 
-        document_id, 
-        "owner"
-    )
+    await authz_service.assign_document_role(user_id, document_id, "owner")
     
-    if not success:
-        raise HTTPException(status_code=500, detail="Failed to assign role")
+    await authz_service.set_document_public(document_id, document.is_public)
 
     return Document(
         id=document_db.id,
         title=document_db.title,
         organization_id=document_db.organization_id,
+        is_public=document_db.is_public,
         created_at=document_db.created_at
     )
 
@@ -126,18 +123,69 @@ async def update_document(
     
     # Update fields
     update_data = document_update.dict(exclude_unset=True)
+    if 'is_public' in update_data:
+        # Solo owner o admin pueden cambiar visibilidad
+        is_owner = await authz_service.can_delete_document(user_id, document_id)
+        is_admin = await authz_service.can_add_member(user_id, document_db.organization_id)
+        
+        if not (is_owner or is_admin):
+            raise HTTPException(status_code=403, detail="Cannot change document visibility")
+    
+    # Apply changes
+    old_is_public = document_db.is_public
     for field, value in update_data.items():
         setattr(document_db, field, value)
     
     await db.commit()
     await db.refresh(document_db)
     
+    # NUEVO: Update public attribute in OpenFGA if changed
+    if 'is_public' in update_data and document_db.is_public != old_is_public:
+        await authz_service.set_document_public(document_id, document_db.is_public)
+    
     return Document(
         id=document_db.id,
         title=document_db.title,
         organization_id=document_db.organization_id,
+        is_public=document_db.is_public,  # NUEVO
         created_at=document_db.created_at
     )
+
+@router.put("/{document_id}/visibility")
+async def toggle_document_visibility(
+    document_id: str,
+    is_public: bool = Query(..., description="Set document as public or private"),
+    user_id: str = Query(..., description="User ID for authorization"),
+    db: AsyncSession = Depends(get_db)
+):
+    """Change document visibility (owner or admin only)."""
+    
+    result = await db.execute(select(DocumentDB).where(DocumentDB.id == document_id))
+    document_db = result.scalar_one_or_none()
+    
+    if not document_db:
+        raise HTTPException(status_code=404, detail="Document not found")
+    
+    # Verificar permisos (solo owner o admin)
+    is_owner = await authz_service.can_delete_document(user_id, document_id)
+    is_admin = await authz_service.can_add_member(user_id, document_db.organization_id)
+    
+    if not (is_owner or is_admin):
+        raise HTTPException(status_code=403, detail="Owner or admin access required")
+    
+    # Update database
+    document_db.is_public = is_public
+    await db.commit()
+    
+    # Update OpenFGA
+    await authz_service.set_document_public(document_id, is_public)
+    
+    visibility = "public" if is_public else "private"
+    return {
+        "message": f"Document {document_id} is now {visibility}",
+        "document_id": document_id,
+        "is_public": is_public
+    }
 
 @router.delete("/{document_id}")
 async def delete_document(

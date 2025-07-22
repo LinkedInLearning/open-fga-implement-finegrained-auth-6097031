@@ -15,7 +15,6 @@ model: |
       define can_view_member: admin or member
       define can_add_document: admin or member
 
-
   type document
     relations
       define organization: [organization]
@@ -23,19 +22,16 @@ model: |
       # Roles específicos del documento
       define owner: [user]
       define editor: [user]
-      define viewer: [user]
+      define viewer: [user, user:*]
 
       # Permisos que combinan roles organizacionales Y específicos del documento
-      define can_read: viewer or editor or owner or member from organization or admin from organization
+      define can_read: owner or editor or viewer or admin from organization or member from organization or viewer from organization
       define can_write: editor or owner or admin from organization
       define can_delete: owner or admin from organization      
 
 tuples:
   - user: user:alice
     relation: admin
-    object: organization:tech-company
-  - user: user:bob
-    relation: member
     object: organization:tech-company
   - user: user:charlie
     relation: viewer
@@ -89,7 +85,7 @@ tests:
       object: document:technical-specs
       assertions:
         can_write: false
-        can_read: true
+        can_read: false # bob is not in the organization
     - user: user:charlie
       object: document:company-handbook
       assertions:
@@ -108,12 +104,12 @@ tests:
     - user: user:bob
       object: document:personal-notes
       assertions:
-        can_read: true # because member of organization
+        can_read: false # because not member of organization
         can_write: false
     - user: user:charlie
       object: document:personal-notes
       assertions:
-        can_read: false # not a member of the organization
+        can_read: true 
         can_write: false
     # Permisos organizacionales:
     - user: user:alice
@@ -127,7 +123,7 @@ tests:
     - user: user:bob
       object: organization:tech-company
       assertions:
-        can_view_member: true
+        can_view_member: false # not in the organization
     - user: user:bob
       object: document:project-plan
       assertions:
