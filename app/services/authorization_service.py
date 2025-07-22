@@ -88,5 +88,80 @@ class AuthorizationService:
             object_id=f"document:{document_id}"
         )
 
+    async def assign_document_role(self, user_id: str, document_id: str, role: str) -> bool:
+            """Assign a document-specific role to a user (owner, editor, viewer)."""
+            if role not in ["owner", "editor", "viewer"]:
+                raise ValueError("Role must be 'owner', 'editor', or 'viewer'")
+                
+            client_tuple = ClientTuple(
+                user=f"user:{user_id}",
+                relation=role,
+                object=f"document:{document_id}"
+            )
+            return await openfga_client.write_tuples([client_tuple])
+        
+    async def remove_document_role(self, user_id: str, document_id: str, role: str) -> bool:
+        """Remove a document-specific role from a user."""
+        if role not in ["owner", "editor", "viewer"]:
+            raise ValueError("Role must be 'owner', 'editor', or 'viewer'")
+            
+        client_tuple = ClientTuple(
+            user=f"user:{user_id}",
+            relation=role,
+            object=f"document:{document_id}"
+        )
+        return await openfga_client.delete_tuples([client_tuple])
+
+    async def assign_document_to_organization(self, document_id: str, organization_id: str) -> bool:
+        """Assign a document to an organization."""
+        client_tuple = ClientTuple(
+            user=f"organization:{organization_id}",
+            relation="organization",
+            object=f"document:{document_id}"
+        )
+        return await openfga_client.write_tuples([client_tuple])
+
+    # Document permission checks
+    async def can_read_document(self, user_id: str, document_id: str) -> bool:
+        """Check if user can read a document."""
+        return await openfga_client.check_permission(
+            user=f"user:{user_id}",
+            relation="can_read",
+            object_id=f"document:{document_id}"
+        )
+
+    async def can_write_document(self, user_id: str, document_id: str) -> bool:
+        """Check if user can write/edit a document."""
+        return await openfga_client.check_permission(
+            user=f"user:{user_id}",
+            relation="can_write",
+            object_id=f"document:{document_id}"
+        )
+
+    async def can_delete_document(self, user_id: str, document_id: str) -> bool:
+        """Check if user can delete a document."""
+        return await openfga_client.check_permission(
+            user=f"user:{user_id}",
+            relation="can_delete",
+            object_id=f"document:{document_id}"
+        )
+
+    async def can_share_document(self, user_id: str, document_id: str) -> bool:
+        """Check if user can share a document."""
+        return await openfga_client.check_permission(
+            user=f"user:{user_id}",
+            relation="can_share",
+            object_id=f"document:{document_id}"
+        )
+
+    # Organization document permissions  
+    async def can_add_document(self, user_id: str, organization_id: str) -> bool:
+        """Check if user can add documents to organization (admin or member)."""
+        return await openfga_client.check_permission(
+            user=f"user:{user_id}",
+            relation="can_add_document",
+            object_id=f"organization:{organization_id}"
+        )
+
 # Global authorization service instance
 authz_service = AuthorizationService()

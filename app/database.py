@@ -34,8 +34,7 @@ class DocumentDB(Base):
     __tablename__ = "documents"
     
     id = Column(String, primary_key=True, index=True)
-    name = Column(String, nullable=False, index=True)
-    description = Column(Text, nullable=True)
+    title = Column(String, nullable=False, index=True)
     organization_id = Column(String, nullable=False, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
