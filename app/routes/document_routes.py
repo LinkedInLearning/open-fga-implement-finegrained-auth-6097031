@@ -145,7 +145,7 @@ async def update_document(
     
     return Document(
         id=document_db.id,
-        title=document_db.title,
+        title=document_db.name,
         organization_id=document_db.organization_id,
         is_public=document_db.is_public,  # NUEVO
         created_at=document_db.created_at
