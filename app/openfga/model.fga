@@ -1,0 +1,29 @@
+model 
+schema 1.1
+
+type user
+
+type organization
+  relations
+    define admin: [user]
+    define member: [user]
+    define viewer: [user]
+
+    define can_add_member: admin
+    define can_delete_member: admin
+    define can_view_member: admin or member
+    define can_add_document: admin or member
+
+type document
+  relations
+    define organization: [organization]
+    
+    # Roles específicos del documento
+    define owner: [user]
+    define editor: [user]
+    define viewer: [user, user:*]
+
+    # Permisos que combinan roles organizacionales Y específicos del documento
+    define can_read: owner or editor or viewer or admin from organization or member from organization or viewer from organization
+    define can_write: editor or owner or admin from organization
+    define can_delete: owner or admin from organization   

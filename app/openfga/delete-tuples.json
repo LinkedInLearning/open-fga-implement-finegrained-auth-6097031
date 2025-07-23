@@ -1,0 +1,12 @@
+[
+  {
+    "user": "user:charlie",
+    "relation": "viewer",
+    "object": "organization:tech-company"
+  },
+  {
+    "user": "user:diana", 
+    "relation": "member",
+    "object": "organization:marketing-dept"
+  }
+]
