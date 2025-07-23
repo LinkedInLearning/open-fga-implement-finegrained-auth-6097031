@@ -4,6 +4,9 @@ from app.utils.openfga_client import openfga_client
 
 ROLES = ["admin", "member", "viewer"]
 
+# Paso 5: Crear un servicio de autorización 
+# que maneje la lógica de permisos y relaciones
+# Este servicio utilizará el cliente OpenFGA 
 class AuthorizationService:
     """Simple RBAC authorization service using OpenFGA."""
     

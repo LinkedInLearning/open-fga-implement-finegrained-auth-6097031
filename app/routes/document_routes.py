@@ -12,6 +12,8 @@ from app.services.authorization_service import authz_service
 
 router = APIRouter()
 
+# Paso 6: implementar las rutas para manejar documentos
+# Estas rutas utilizarán el servicio de autorización para verificar permisos
 @router.get("/", response_model=List[Document])
 async def list_documents(
     user_id: str = Query(..., description="User ID for authorization"),

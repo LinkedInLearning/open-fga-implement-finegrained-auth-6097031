@@ -1,11 +1,15 @@
 import asyncio
 from typing import Optional, Dict, Any
+# Paso 3: importar el cliente de OpenFGA y las clases necesarias
 from openfga_sdk import OpenFgaClient
 from openfga_sdk.client import ClientConfiguration
 from openfga_sdk.client.models import ClientCheckRequest, ClientWriteRequest, ClientTuple
 from dotenv import load_dotenv
 import os
 
+# Paso 4: Crear un cliente OpenFGA
+# esta clase se encargará de interactuar con OpenFGA directamente
+# usando el SDK de OpenFGA
 class OpenFGAClient:
     def __init__(self):
         # Load environment variables from .env file

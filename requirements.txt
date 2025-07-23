@@ -5,6 +5,6 @@ alembic==1.16.4
 python-multipart==0.0.6
 pydantic==2.11.7
 pydantic-settings==2.10.1
-openfga-sdk==0.9.5
+openfga-sdk==0.9.5 # Paso 1: Instalar el SDK de OpenFGA
 aiosqlite==0.21.0
 python-dotenv==1.1.1
