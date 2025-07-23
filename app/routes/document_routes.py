@@ -12,6 +12,9 @@ from app.services.authorization_service import authz_service
 
 router = APIRouter()
 
+# Paso 6: implementar las rutas para manejar documentos
+# Estas rutas utilizarán el servicio de autorización para verificar permisos
+
 @router.get("/", response_model=List[Document])
 async def list_documents(
     user_id: str = Query(..., description="User ID for authorization"),
@@ -267,7 +270,7 @@ async def remove_document_role(
 @router.get("/{document_id}/permissions", response_model=DocumentPermissions)
 async def check_document_permissions(
     document_id: str,
-    user_id: str = Query(..., description="User ID to check permissions for"),
+    user_id: str = Qury(..., description="User ID to check permissions for"),
     db: AsyncSession = Depends(get_db)
 ):
     """Check what permissions a user has on a specific document."""
