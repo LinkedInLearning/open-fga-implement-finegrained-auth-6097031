@@ -38,10 +38,6 @@ class DocumentDB(Base):
     organization_id = Column(String, nullable=False, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     is_public = Column(Boolean, nullable=False, default=False, index=True)
-<<<<<<< HEAD
-
-=======
->>>>>>> 776b310 (02_04)
 
 # Database dependency
 async def get_db():

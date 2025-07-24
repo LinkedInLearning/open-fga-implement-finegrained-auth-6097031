@@ -1,5 +1,9 @@
 from typing import List, Optional
-from openfga_sdk.client.models import ClientTuple
+from openfga_sdk.client.models import ClientTuple, ClientBatchCheckItem, ClientBatchCheckRequest
+<<<<<<< HEAD
+
+=======
+>>>>>>> 4b56674 (04_02)
 from app.utils.openfga_client import openfga_client
 
 ROLES = ["admin", "member", "viewer"]
@@ -7,7 +11,6 @@ ROLES = ["admin", "member", "viewer"]
 # Paso 5: Crear un servicio de autorización 
 # que maneje la lógica de permisos y relaciones
 # Este servicio utilizará el cliente OpenFGA 
-
 class AuthorizationService:
     """Simple RBAC authorization service using OpenFGA."""
     
@@ -55,7 +58,6 @@ class AuthorizationService:
             relation=relation,
             object_id=object_id
         )
-    
     async def can_add_member(self, user_id: str, organization_id: str) -> bool:
         """Check if user can add members to organization (admin only)."""
         return await openfga_client.check_permission(
@@ -204,6 +206,29 @@ class AuthorizationService:
             relation="viewer",
             object_id=f"document:{document_id}"
         )
+
+    async def can_view_documents(self, user_id: str, document_ids: List[str]) -> List[str]:
+        """Check if a user has viewer access to multiple documents at once.
+        
+        Args:
+            user_id: The ID of the user
+            document_ids: List of document IDs to check permissions for
+            
+        Returns:
+            List of document IDs that the user has permission to view
+        """
+        batch_request = ClientBatchCheckRequest(
+            checks=[
+                ClientBatchCheckItem(
+                    user=f"user:{user_id}",
+                    relation="can_read",
+                    object=f"document:{doc_id}"
+                ) for doc_id in document_ids
+            ]
+        )
+        
+        allowed_objects = await openfga_client.batch_check_permission(batch_request)
+        return [obj.replace("document:", "") for obj in allowed_objects]
 
 # Global authorization service instance
 authz_service = AuthorizationService()

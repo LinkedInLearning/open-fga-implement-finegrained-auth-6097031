@@ -6,14 +6,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.models.document import *
-
 from app.database import get_db, DocumentDB
 from app.services.authorization_service import authz_service
 
 router = APIRouter()
 
-# Paso 6: implementar las rutas para manejar documentos
-# Estas rutas utilizarán el servicio de autorización para verificar permisos
 @router.get("/", response_model=List[Document])
 async def list_documents(
     user_id: str = Query(..., description="User ID for authorization"),
@@ -28,19 +25,17 @@ async def list_documents(
     
     result = await db.execute(query)
     all_documents = result.scalars().all()
+
+    # Create a dictionary for O(1) lookups
+    docs_by_id = {doc.id: doc for doc in all_documents}
+    doc_ids = [doc.id for doc in all_documents]
+    print("All documents:", doc_ids)
     
-    accessible_documents = []
-    for document in all_documents:
-        if await authz_service.can_view_document(user_id, document.id):
-            accessible_documents.append(Document(
-                id=document.id,
-                title=document.title,
-                description=document.description,
-                organization_id=document.organization_id,
-                created_at=document.created_at
-            ))
+    # Get list of document IDs the user can view
+    accessible_document_ids = await authz_service.can_view_documents(user_id, doc_ids)
     
-    return accessible_documents
+    # Filter documents based on permissions
+    return [docs_by_id[doc_id] for doc_id in accessible_document_ids if doc_id in docs_by_id]
 
 @router.get("/{document_id}", response_model=Document)
 async def get_document(
