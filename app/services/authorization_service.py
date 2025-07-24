@@ -2,7 +2,6 @@ from typing import List, Optional
 from openfga_sdk.client.models import ClientTuple, ClientBatchCheckItem, ClientBatchCheckRequest, ClientListObjectsRequest, ClientBatchCheckRequest
 from openfga_sdk.client.models.list_users_request import ClientListUsersRequest
 from openfga_sdk.models import UserTypeFilter, FgaObject
-
 from app.utils.openfga_client import openfga_client
 
 ROLES = ["admin", "member", "viewer"]
@@ -57,6 +56,7 @@ class AuthorizationService:
             relation=relation,
             object_id=object_id
         )
+    
     async def can_add_member(self, user_id: str, organization_id: str) -> bool:
         """Check if user can add members to organization (admin only)."""
         return await openfga_client.check_permission(
@@ -177,33 +177,6 @@ class AuthorizationService:
             user=f"user:{user_id}",
             relation="can_add_document",
             object_id=f"organization:{organization_id}"
-        )    
-    
-    async def set_document_public(self, document_id: str, is_public: bool) -> bool:
-        """Set document as public or private using the viewer relation."""
-        if is_public:
-            # Añadir tupla viewer con user:* para acceso público
-            client_tuple = ClientTuple(
-                user="user:*",
-                relation="viewer",
-                object=f"document:{document_id}"
-            )
-            return await openfga_client.write_tuples([client_tuple])
-        else:
-            # Remover tupla viewer con user:*
-            client_tuple = ClientTuple(
-                user="user:*",
-                relation="viewer", 
-                object=f"document:{document_id}"
-            )
-            return await openfga_client.delete_tuples([client_tuple])
-    
-    async def is_document_public(self, document_id: str) -> bool:
-        """Check if a document is marked as public by checking user:* viewer relation."""
-        return await openfga_client.check_permission(
-            user="user:*",
-            relation="viewer",
-            object_id=f"document:{document_id}"
         )
     
     async def set_document_public(self, document_id: str, is_public: bool) -> bool:
