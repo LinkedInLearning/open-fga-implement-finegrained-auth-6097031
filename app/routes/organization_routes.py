@@ -18,6 +18,7 @@ router = APIRouter()
 
 # Paso 6: implementar las rutas para manejar organizaciones
 # Estas rutas utilizarán el servicio de autorización para verificar permisos
+
 @router.get("/", response_model=List[Organization])
 async def list_organizations(
     user_id: str = Query(..., description="User ID for authorization"),
@@ -38,6 +39,20 @@ async def list_organizations(
                 created_at=org.created_at
             ))
     return accessible_orgs
+
+@router.get("/{organization_id}/members", response_model=List[MemberAssignment])
+async def org_members(
+    organization_id: str,
+    user_id: str = Query(..., description="User ID for authorization")
+):
+    """List all users that are members of this organization."""
+    if not await authz_service.can_view_member(user_id, organization_id):
+        raise HTTPException(status_code=403, detail="Access denied")
+   
+    members = await authz_service.organization_members(organization_id)
+    print(f"Members of organization {organization_id}: {members}")
+    # Return members as a list of MemberAssignment objects
+    return [MemberAssignment(user_id=m.object.id, role="member", organization_id=organization_id) for m in members]
 
 @router.get("/{organization_id}", response_model=Organization)
 async def get_organization(
