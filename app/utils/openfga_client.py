@@ -5,7 +5,7 @@ from typing import Optional, Dict, Any
 
 from openfga_sdk import OpenFgaClient
 from openfga_sdk.client import ClientConfiguration
-from openfga_sdk.client.models import ClientCheckRequest, ClientWriteRequest, ClientTuple
+from openfga_sdk.client.models import ClientCheckRequest, ClientWriteRequest, ClientTuple, ClientBatchCheckItem, ClientBatchCheckRequest
 from dotenv import load_dotenv
 import os
 
@@ -41,6 +41,24 @@ class OpenFGAClient:
         except Exception as e:
             print(f"Error checking permission: {e}")
             return False
+
+    async def batch_check_permission(self, requests: ClientBatchCheckRequest) -> list[str]:
+        """Check multiple permissions at once.
+            
+        Returns:
+            A list of object IDs for which the permission check was allowed.
+        """
+        try:
+            response = await self.client.batch_check(requests)
+            results = []
+            for result in response.result:
+                if result.allowed:
+                    results.append(result.request.object)
+            return results
+
+        except Exception as e:
+            print(f"Error performing batch check: {e}")
+            return []
 
     async def write_tuples(self, tuples: list[ClientTuple]) -> bool:
         """Write relationship tuples to OpenFGA."""
