@@ -1,9 +1,7 @@
 import asyncio
 from typing import Optional, Dict, Any
-<<<<<<< HEAD
+
 # Paso 3: importar el cliente de OpenFGA y las clases necesarias
-=======
->>>>>>> 8e1bb62 (02_02)
 from openfga_sdk import OpenFgaClient
 from openfga_sdk.client import ClientConfiguration
 from openfga_sdk.client.models import ClientCheckRequest, ClientWriteRequest, ClientTuple
