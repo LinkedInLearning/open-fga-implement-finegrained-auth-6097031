@@ -10,8 +10,8 @@ from openfga_sdk.client.models import (
     ClientWriteRequest, 
     ClientTuple, 
     ClientBatchCheckRequest,
-    ClientListObjectsRequest
-)
+    ClientListObjectsRequest)
+from openfga_sdk.client.models.list_users_request import ClientListUsersRequest
 from dotenv import load_dotenv
 import os
 
@@ -94,21 +94,39 @@ class OpenFGAClient:
         """List all objects of a type that the user has the specified relation to.
         
         Args:
-            user: The user to check permissions for
-            relation: The relation to check
-            type: The type of objects to list (e.g., 'document', 'organization')
-            context: Optional dictionary of context values for the authorization model
+            request: A ClientListObjectsRequest containing the query parameters
             
         Returns:
             A list of object IDs that the user has the specified relation to
         """
         try:
-              
             response = await self.client.list_objects(request)
             return response.objects
             
         except Exception as e:
             print(f"Error listing objects: {e}")
+            return []
+
+    async def list_users(self, request: ClientListUsersRequest) -> list[str]:
+        """List all users that have a specific relation to an object.
+        
+        Args:
+            request: A ClientListUsersRequest containing:
+                - object: FgaObject with type and id of the target object
+                - relation: The relation to check
+                - user_filters: Optional list of UserTypeFilter to filter users by type
+                - context: Optional context dictionary
+                - contextual_tuples: Optional list of additional tuples to consider
+            
+        Returns:
+            A list of user IDs that have the specified relation to the object
+        """
+        try:
+            response = await self.client.list_users(request)
+            return response.users
+            
+        except Exception as e:
+            print(f"Error listing users: {e}")
             return []
 
 # Global client instance
