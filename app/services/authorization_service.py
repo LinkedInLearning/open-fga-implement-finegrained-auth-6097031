@@ -1,9 +1,5 @@
 from typing import List, Optional
-from openfga_sdk.client.models import ClientTuple, ClientBatchCheckItem, ClientBatchCheckRequest
-<<<<<<< HEAD
-
-=======
->>>>>>> 4b56674 (04_02)
+from openfga_sdk.client.models import ClientTuple, ClientBatchCheckItem, ClientBatchCheckRequest, ClientListObjectsRequest
 from app.utils.openfga_client import openfga_client
 
 ROLES = ["admin", "member", "viewer"]
@@ -229,6 +225,31 @@ class AuthorizationService:
         
         allowed_objects = await openfga_client.batch_check_permission(batch_request)
         return [obj.replace("document:", "") for obj in allowed_objects]
+    
+    async def readable_documents(self, user_id: str) -> List[str]:
+        """List all documents that a user can read.
+        
+        Args:
+            user_id: The ID of the user
+            
+        Returns:
+            List of document IDs that the user can read
+        """
+        try:
+            # Create a request to list all documents the user can read
+            request = ClientListObjectsRequest(
+                    user=f"user:{user_id}",
+                    relation="can_read",
+                    type="document",
+                    context=dict(ViewCount=100)
+            )
+            
+            response = await openfga_client.list_objects(request)
+            return [obj.replace("document:", "") for obj in response]
+        
+        except Exception as e:
+            print(f"Error listing readable documents: {e}")
+            return []
 
 # Global authorization service instance
 authz_service = AuthorizationService()

@@ -5,7 +5,13 @@ from typing import Optional, Dict, Any
 
 from openfga_sdk import OpenFgaClient
 from openfga_sdk.client import ClientConfiguration
-from openfga_sdk.client.models import ClientCheckRequest, ClientWriteRequest, ClientTuple, ClientBatchCheckItem, ClientBatchCheckRequest
+from openfga_sdk.client.models import (
+    ClientCheckRequest, 
+    ClientWriteRequest, 
+    ClientTuple, 
+    ClientBatchCheckRequest,
+    ClientListObjectsRequest
+)
 from dotenv import load_dotenv
 import os
 
@@ -85,6 +91,27 @@ class OpenFGAClient:
         except Exception as e:
             print(f"Error deleting tuples: {e}")
             return False
+
+    async def list_objects(self, request: ClientListObjectsRequest) -> list[str]:
+        """List all objects of a type that the user has the specified relation to.
+        
+        Args:
+            user: The user to check permissions for
+            relation: The relation to check
+            type: The type of objects to list (e.g., 'document', 'organization')
+            context: Optional dictionary of context values for the authorization model
+            
+        Returns:
+            A list of object IDs that the user has the specified relation to
+        """
+        try:
+              
+            response = await self.client.list_objects(request)
+            return response.objects
+            
+        except Exception as e:
+            print(f"Error listing objects: {e}")
+            return []
 
 # Global client instance
 openfga_client = OpenFGAClient()

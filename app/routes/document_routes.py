@@ -18,22 +18,21 @@ async def list_documents(
     db: AsyncSession = Depends(get_db)
 ):
     """List all documents the user can view."""
+   
+    # Get list of document IDs the user can view
+    accessible_document_ids = await authz_service.readable_documents(user_id)
+
     # Build query
     query = select(DocumentDB)
     if organization_id:
-        query = query.where(DocumentDB.organization_id == organization_id)
+        query = query.where(DocumentDB.organization_id == organization_id and DocumentDB.id.in_(accessible_document_ids))
     
+    # Execute query only for accessible documents
     result = await db.execute(query)
-    all_documents = result.scalars().all()
+    documents = result.scalars().all()
 
-    # Create a dictionary for O(1) lookups
-    docs_by_id = {doc.id: doc for doc in all_documents}
-    doc_ids = [doc.id for doc in all_documents]
-    print("All documents:", doc_ids)
-    
-    # Get list of document IDs the user can view
-    accessible_document_ids = await authz_service.can_view_documents(user_id, doc_ids)
-    
+    docs_by_id = {doc.id: doc for doc in documents}
+
     # Filter documents based on permissions
     return [docs_by_id[doc_id] for doc_id in accessible_document_ids if doc_id in docs_by_id]
 
