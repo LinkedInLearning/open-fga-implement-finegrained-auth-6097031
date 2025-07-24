@@ -25,6 +25,9 @@ class OpenFGAClient:
         print(f"Connecting to OpenFGA at {os.getenv("OPENFGA_API_URL")} with store ID {os.getenv("OPENFGA_STORE_ID")}")
         self.client = OpenFgaClient(configuration)
 
+    # Paso 1: agregar un método para verificar permisos
+    # usando el endpoint check de OpenFGA mediante el SDK
+    # https://openfga.dev/api/service#/Relationship%20Queries/Check
     async def check_permission(self, user: str, relation: str, object_id: str) -> bool:
         """Check if a user has a specific relation to an object."""
         try:

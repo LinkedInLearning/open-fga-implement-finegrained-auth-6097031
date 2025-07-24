@@ -44,6 +44,18 @@ class AuthorizationService:
         )
         return await openfga_client.write_tuples([client_tuple])
     
+    # Paso 2: llamar al metodo check_permission del cliente OpenFGA
+    # en los metodos que lo requieran
+    # este metodo puede sustituir a los metodos subsecuentes
+    # pero por claridad y simplicidad, se mantienen los metodos individuales
+    async def can_perform_action(self, user_id: str, relation: str, object_id: str) -> bool:
+        """Check if a user can perform a specific action on an object."""
+        return await openfga_client.check_permission(
+            user=f"user:{user_id}",
+            relation=relation,
+            object_id=object_id
+        )
+    
     async def can_add_member(self, user_id: str, organization_id: str) -> bool:
         """Check if user can add members to organization (admin only)."""
         return await openfga_client.check_permission(
