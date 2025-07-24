@@ -33,7 +33,6 @@ async def list_documents(
     documents = result.scalars().all()
 
     docs_by_id = {doc.id: doc for doc in documents}
-
     # Filter documents based on permissions
     return [docs_by_id[doc_id] for doc_id in accessible_document_ids if doc_id in docs_by_id]
 
@@ -185,7 +184,6 @@ async def toggle_document_visibility(
         "document_id": document_id,
         "is_public": is_public
     }
-
 @router.delete("/{document_id}")
 async def delete_document(
     document_id: str,

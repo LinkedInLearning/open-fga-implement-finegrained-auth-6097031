@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     # Paso 3: Cargar las variables de entorno de OpenFGA
     # en este caso se esta usando pydantic-settings para manejar la configuración
     # mas info: https://github.com/pydantic/pydantic-settings
+
     openfga_api_url: str = "http://localhost:8080"
     openfga_store_id: str = ""
     openfga_authorization_model_id: str = ""

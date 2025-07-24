@@ -11,7 +11,7 @@ from openfga_sdk.client.models import (
     ClientTuple, 
     ClientBatchCheckRequest, ClientListObjectsRequest)
 from openfga_sdk.client.models import ClientCheckRequest, ClientWriteRequest, ClientTuple, ClientBatchCheckItem, ClientBatchCheckRequest
-
+from openfga_sdk.client.models.list_users_request import ClientListUsersRequest
 from dotenv import load_dotenv
 import os
 

@@ -1,0 +1,16 @@
+name: Test OpenFGA Model
+run-name: ${{ github.actor }} is testing the OpenFGA model
+on: [push]
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Test OpenFGA Model
+        uses: openfga/action-openfga-test@v0.1.1
+        with:
+          test_path: app/openfga/model.fga.yaml
