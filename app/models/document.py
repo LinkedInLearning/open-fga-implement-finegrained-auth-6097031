@@ -34,4 +34,3 @@ class DocumentPermissions(BaseModel):
     document_id: str
     can_read: bool
     can_write: bool
-    can_delete: bool

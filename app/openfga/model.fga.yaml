@@ -165,4 +165,3 @@ tests:
       object: document:personal-notes
       assertions:
         viewer: true
-

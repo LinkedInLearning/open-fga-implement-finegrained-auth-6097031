@@ -18,7 +18,6 @@ router = APIRouter()
 
 # Paso 6: implementar las rutas para manejar organizaciones
 # Estas rutas utilizarán el servicio de autorización para verificar permisos
-
 @router.get("/", response_model=List[Organization])
 async def list_organizations(
     user_id: str = Query(..., description="User ID for authorization"),

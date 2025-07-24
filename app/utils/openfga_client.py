@@ -5,14 +5,19 @@ from typing import Optional, Dict, Any
 
 from openfga_sdk import OpenFgaClient
 from openfga_sdk.client import ClientConfiguration
-from openfga_sdk.client.models import ClientCheckRequest, ClientWriteRequest, ClientTuple, ClientBatchCheckItem, ClientBatchCheckRequest
+from openfga_sdk.client.models import (
+    ClientCheckRequest, 
+    ClientWriteRequest, 
+    ClientTuple, 
+    ClientBatchCheckRequest,
+    ClientListObjectsRequest
+)
 from dotenv import load_dotenv
 import os
 
 # Paso 4: Crear un cliente OpenFGA
 # esta clase se encargará de interactuar con OpenFGA directamente
 # usando el SDK de OpenFGA
-
 class OpenFGAClient:
     def __init__(self):
         # Load environment variables from .env file
@@ -29,7 +34,6 @@ class OpenFGAClient:
     # Paso 1: agregar un método para verificar permisos
     # usando el endpoint check de OpenFGA mediante el SDK
     # https://openfga.dev/api/service#/Relationship%20Queries/Check
-
     async def check_permission(self, user: str, relation: str, object_id: str) -> bool:
         """Check if a user has a specific relation to an object."""
         try:
@@ -85,6 +89,27 @@ class OpenFGAClient:
         except Exception as e:
             print(f"Error deleting tuples: {e}")
             return False
+
+    async def list_objects(self, request: ClientListObjectsRequest) -> list[str]:
+        """List all objects of a type that the user has the specified relation to.
+        
+        Args:
+            user: The user to check permissions for
+            relation: The relation to check
+            type: The type of objects to list (e.g., 'document', 'organization')
+            context: Optional dictionary of context values for the authorization model
+            
+        Returns:
+            A list of object IDs that the user has the specified relation to
+        """
+        try:
+              
+            response = await self.client.list_objects(request)
+            return response.objects
+            
+        except Exception as e:
+            print(f"Error listing objects: {e}")
+            return []
 
 # Global client instance
 openfga_client = OpenFGAClient()
