@@ -22,12 +22,16 @@ model: |
       # Roles específicos del documento
       define owner: [user]
       define editor: [user]
-      define viewer: [user, user:*]
+      define viewer: [user, user:*, user with temporal_access]
 
       # Permisos que combinan roles organizacionales Y específicos del documento
       define can_read: owner or editor or viewer or admin from organization or member from organization or viewer from organization
       define can_write: editor or owner or admin from organization
-      define can_delete: owner or admin from organization      
+      define can_delete: owner or admin from organization
+
+  condition temporal_access(grant_time: timestamp, grant_duration: duration, current_time: timestamp) {
+     current_time < grant_time + grant_duration
+  }
 
 tuples:
   - user: user:alice
@@ -72,6 +76,15 @@ tuples:
   - user: user:charlie
     relation: viewer
     object: document:company-handbook
+  - user: user:bob
+    relation: viewer
+    object: document:personal-notes
+    condition: 
+      name: temporal_access
+      context: 
+        grant_time : "2023-01-01T00:00:00Z"
+        grant_duration : 1h
+        current_time: "2023-01-01T00:10:00Z"
 
 tests:
   - check:
@@ -103,7 +116,6 @@ tests:
     - user: user:bob
       object: document:personal-notes
       assertions:
-        can_read: false # because not member of organization
         can_write: false
     - user: user:charlie
       object: document:personal-notes
@@ -147,3 +159,10 @@ tests:
       object: document:company-handbook
       assertions: 
         viewer: true
+  - name: "Test temporal access for user:bob"
+    check:
+    - user: user:bob
+      object: document:personal-notes
+      assertions:
+        viewer: true
+
