@@ -184,6 +184,7 @@ async def toggle_document_visibility(
         "document_id": document_id,
         "is_public": is_public
     }
+
 @router.delete("/{document_id}")
 async def delete_document(
     document_id: str,

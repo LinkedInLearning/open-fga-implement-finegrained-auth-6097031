@@ -1,7 +1,6 @@
 model: |
-  model
-    schema 1.1
-
+  model 
+  schema 1.1
 
   type user
 
@@ -40,7 +39,6 @@ model: |
      current_time < grant_time + grant_duration
   }
 
-      
 tuples:
   - user: user:alice
     relation: admin

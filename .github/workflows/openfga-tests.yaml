@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+# OpenFGA Tests Workflow
+# This workflow runs tests for the OpenFGA model defined in the specified YAML file.
+=======
+>>>>>>> 8d72a38 (04_04)
 name: Test OpenFGA Model
 run-name: ${{ github.actor }} is testing the OpenFGA model
 on: [push]

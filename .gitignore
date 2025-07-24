@@ -207,8 +207,5 @@ marimo/_lsp/
 __marimo__/
 
 scripts/
-<<<<<<< HEAD
 app.db
-=======
-app.db
->>>>>>> 8e1bb62 (02_02)
+

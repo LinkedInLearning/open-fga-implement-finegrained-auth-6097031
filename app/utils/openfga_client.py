@@ -10,7 +10,7 @@ from openfga_sdk.client.models import (
     ClientWriteRequest, 
     ClientTuple, 
     ClientBatchCheckRequest, ClientListObjectsRequest)
-from openfga_sdk.client.models import ClientCheckRequest, ClientWriteRequest, ClientTuple, ClientBatchCheckItem, ClientBatchCheckRequest
+
 from openfga_sdk.client.models.list_users_request import ClientListUsersRequest
 from dotenv import load_dotenv
 import os
@@ -64,7 +64,6 @@ class OpenFGAClient:
         except Exception as e:
             print(f"Error performing batch check: {e}")
             return []
-
     async def write_tuples(self, tuples: list[ClientTuple]) -> bool:
         """Write relationship tuples to OpenFGA."""
         try:
