@@ -24,7 +24,6 @@ model: |
       define editor: [user]
       define viewer: [user, user:*, user with temporal_access]
 
-
       # Permisos que combinan roles organizacionales Y específicos del documento
       define can_read: owner or editor or viewer or admin from organization or member from organization or viewer from organization
       define can_write: editor or owner or admin from organization
@@ -166,3 +165,4 @@ tests:
       object: document:personal-notes
       assertions:
         viewer: true
+

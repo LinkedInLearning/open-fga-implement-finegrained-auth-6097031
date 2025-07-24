@@ -1,7 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import Column, String, DateTime, Text, Boolean
-
 from datetime import datetime
 from app.config import settings
 
@@ -39,6 +38,10 @@ class DocumentDB(Base):
     organization_id = Column(String, nullable=False, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     is_public = Column(Boolean, nullable=False, default=False, index=True)
+<<<<<<< HEAD
+
+=======
+>>>>>>> 776b310 (02_04)
 
 # Database dependency
 async def get_db():

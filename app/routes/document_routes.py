@@ -14,7 +14,6 @@ router = APIRouter()
 
 # Paso 6: implementar las rutas para manejar documentos
 # Estas rutas utilizarán el servicio de autorización para verificar permisos
-
 @router.get("/", response_model=List[Document])
 async def list_documents(
     user_id: str = Query(..., description="User ID for authorization"),
@@ -74,7 +73,9 @@ async def create_document(
     db: AsyncSession = Depends(get_db)
 ):
     """Create a new document (admin or member of organization)."""
-    if not await authz_service.can_add_document(user_id, document.organization_id):
+    # Paso 3: Utilizar el servicio de autorización para verificar permisos
+    # con el nuevo metodo generico 
+    if not await authz_service.can_perform_action(user_id, "can_add_document", f"organization:{document.organization_id}"):
         raise HTTPException(status_code=403, detail="Cannot add documents to this organization")
     
     document_id = str(uuid.uuid4())

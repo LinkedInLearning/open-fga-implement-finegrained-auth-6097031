@@ -2,6 +2,7 @@ import asyncio
 from typing import Optional, Dict, Any
 
 # Paso 3: importar el cliente de OpenFGA y las clases necesarias
+
 from openfga_sdk import OpenFgaClient
 from openfga_sdk.client import ClientConfiguration
 from openfga_sdk.client.models import ClientCheckRequest, ClientWriteRequest, ClientTuple
@@ -11,7 +12,6 @@ import os
 # Paso 4: Crear un cliente OpenFGA
 # esta clase se encargará de interactuar con OpenFGA directamente
 # usando el SDK de OpenFGA
-
 class OpenFGAClient:
     def __init__(self):
         # Load environment variables from .env file
@@ -24,6 +24,10 @@ class OpenFGAClient:
         )
         print(f"Connecting to OpenFGA at {os.getenv("OPENFGA_API_URL")} with store ID {os.getenv("OPENFGA_STORE_ID")}")
         self.client = OpenFgaClient(configuration)
+
+    # Paso 1: agregar un método para verificar permisos
+    # usando el endpoint check de OpenFGA mediante el SDK
+    # https://openfga.dev/api/service#/Relationship%20Queries/Check
 
     async def check_permission(self, user: str, relation: str, object_id: str) -> bool:
         """Check if a user has a specific relation to an object."""
