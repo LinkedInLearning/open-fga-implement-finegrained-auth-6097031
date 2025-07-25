@@ -34,3 +34,7 @@ class DocumentPermissions(BaseModel):
     document_id: str
     can_read: bool
     can_write: bool
+<<<<<<< HEAD
+=======
+    can_delete: bool
+>>>>>>> 776b310 (02_04)
