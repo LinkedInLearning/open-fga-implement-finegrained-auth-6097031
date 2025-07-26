@@ -284,3 +284,5 @@ async def check_document_permissions(
     )
     
     return permissions
+
+

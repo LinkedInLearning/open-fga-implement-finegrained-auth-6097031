@@ -2,7 +2,7 @@
   relation: admin
   object: organization:tech-company
 - user: user:charlie
-  relation: viewer
+  relation: member
   object: organization:tech-company
 - user: user:diana
   relation: member
@@ -40,3 +40,18 @@
 - user: user:charlie
   relation: viewer
   object: document:company-handbook
+- user: user:bob
+  relation: viewer
+  object: document:personal-notes
+  condition: 
+    name: temporal_access
+    context: 
+      grant_time : "2023-01-01T00:00:00Z"
+      grant_duration : 1h
+      current_time: "2023-01-01T00:10:00Z"
+- user: user:alice
+  relation: editor
+  object: folder:project-files
+- user: folder:project-files
+  relation: parent
+  object: document:new-project-doc # alice tiene acceso a este documento porque es editor de la carpeta

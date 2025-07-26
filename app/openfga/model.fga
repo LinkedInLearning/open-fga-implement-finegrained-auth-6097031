@@ -7,23 +7,40 @@ type organization
   relations
     define admin: [user]
     define member: [user]
-    define viewer: [user]
-
+    # Eliminado: viewer (no se usaba correctamente)
+    
+    # Permisos organizacionales
     define can_add_member: admin
     define can_delete_member: admin
     define can_view_member: admin or member
-    define can_add_document: admin or member
+    define can_manage_content: admin or member  # Nuevo: consolida permisos de contenido
+
+type folder
+  relations
+    define organization: [organization]
+    define parent: [folder]  # Nuevo: soporte para jerarquía de carpetas
+    define owner: [user]     # Nuevo: propietario de carpeta
+    define editor: [user] or editor from parent
+    define viewer: [user] or viewer from parent or editor
+    
+    # Permisos de carpeta (antes faltaban)
+    define can_read: viewer or editor or owner or can_manage_content from organization
+    define can_write: editor or owner or can_manage_content from organization
+    define can_delete: owner or admin from organization
 
 type document
   relations
     define organization: [organization]
-    
-    # Roles específicos del documento
+    define parent: [folder]
     define owner: [user]
-    define editor: [user]
-    define viewer: [user, user:*]
+    define editor: [user] or editor from parent
+    define viewer: [user, user:*, user with temporal_access] or viewer from parent
+    
+    # Permisos simplificados y más claros
+    define can_read: viewer or editor or owner or can_manage_content from organization
+    define can_write: editor or owner or can_manage_content from organization
+    define can_delete: owner or admin from organization
 
-    # Permisos que combinan roles organizacionales Y específicos del documento
-    define can_read: owner or editor or viewer or admin from organization or member from organization or viewer from organization
-    define can_write: editor or owner or admin from organization
-    define can_delete: owner or admin from organization   
+condition temporal_access(grant_time: timestamp, grant_duration: duration, current_time: timestamp) {
+  current_time < grant_time + grant_duration
+}

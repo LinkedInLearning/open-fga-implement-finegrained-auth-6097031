@@ -45,6 +45,7 @@ class DocumentDB(Base):
     title = Column(String, nullable=False, index=True)
     organization_id = Column(String, nullable=False, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     is_public = Column(Boolean, nullable=False, default=False, index=True)
 
 # Database dependency
