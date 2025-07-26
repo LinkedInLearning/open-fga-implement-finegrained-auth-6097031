@@ -283,5 +283,35 @@ class AuthorizationService:
             print(f"Error listing org members: {e}")
             return []
 
+    async def organization_members(self, organization_id: str) -> List[str]:
+        """List all users who are members of a organization.
+        
+        Args:
+            organization_id: The ID of the organization
+            
+        Returns:
+            List of user IDs who are members of the organization
+        """
+        try:
+            request = ClientListUsersRequest(
+                relation="member",
+                object=FgaObject(
+                    type="organization",
+                    id=organization_id
+                ),
+                user_filters=[
+                    UserTypeFilter(
+                        type="user"
+                    )
+                ]
+            )
+            
+            response = await openfga_client.list_users(request)
+            return [obj for obj in response]
+        
+        except Exception as e:
+            print(f"Error listing org members: {e}")
+            return []
+
 # Global authorization service instance
 authz_service = AuthorizationService()

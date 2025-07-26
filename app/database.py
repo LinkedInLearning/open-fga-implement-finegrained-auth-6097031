@@ -1,14 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
-<<<<<<< HEAD
-<<<<<<< HEAD
 from sqlalchemy import Column, String, DateTime, Text, Boolean
-=======
-from sqlalchemy import Column, String, DateTime, Text
->>>>>>> 8e1bb62 (02_02)
-=======
-from sqlalchemy import Column, String, DateTime, Text, Boolean
->>>>>>> 776b310 (02_04)
 from datetime import datetime
 from app.config import settings
 
@@ -45,6 +37,7 @@ class DocumentDB(Base):
     title = Column(String, nullable=False, index=True)
     organization_id = Column(String, nullable=False, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     is_public = Column(Boolean, nullable=False, default=False, index=True)
 
 # Database dependency

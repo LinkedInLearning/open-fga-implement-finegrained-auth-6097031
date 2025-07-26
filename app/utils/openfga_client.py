@@ -1,10 +1,11 @@
 import asyncio
-from typing import Optional, Dict, Any
-
-# Paso 3: importar el cliente de OpenFGA y las clases necesarias
-
+from typing import Optional, Dict
+from datetime import datetime, timedelta
 from openfga_sdk import OpenFgaClient
+from openfga_sdk.models import ConsistencyPreference
 from openfga_sdk.client import ClientConfiguration
+from sqlalchemy import select
+from app.database import DocumentDB, AsyncSessionLocal
 from openfga_sdk.client.models import (
     ClientCheckRequest, 
     ClientWriteRequest, 
@@ -18,7 +19,7 @@ import os
 # esta clase se encargará de interactuar con OpenFGA directamente
 # usando el SDK de OpenFGA
 class OpenFGAClient:
-    def __init__(self):
+    def __init__(self, cache_ttl_seconds=30):
         # Load environment variables from .env file
         load_dotenv()
 
@@ -27,8 +28,10 @@ class OpenFGAClient:
             store_id=os.getenv("OPENFGA_STORE_ID"),
             authorization_model_id=os.getenv("OPENFGA_AUTHORIZATION_MODEL_ID"),
         )
+        
         print(f"Connecting to OpenFGA at {os.getenv("OPENFGA_API_URL")} with store ID {os.getenv("OPENFGA_STORE_ID")}")
         self.client = OpenFgaClient(configuration)
+        self.cache_ttl = cache_ttl_seconds
 
     # Paso 1: agregar un método para verificar permisos
     # usando el endpoint check de OpenFGA mediante el SDK
@@ -127,5 +130,43 @@ class OpenFGAClient:
             print(f"Error listing users: {e}")
             return []
 
-# Global client instance
+    async def smart_check(self, user: str, relation: str, object: str):
+        # Si el recurso fue modificado recientemente, usa consistencia alta
+        if await self.was_recently_modified(object):
+            consistency = ConsistencyPreference.HIGHER_CONSISTENCY
+        else:
+            consistency = ConsistencyPreference.MINIMIZE_LATENCY  # Usa caché
+        
+        return await self.fga.check(
+            ClientCheckRequest(
+                user=user, 
+                relation=relation, 
+                object=object),
+            consistency=consistency
+        )
+
+    async def was_recently_modified(self, object_: str) -> bool:
+        # Verifica si fue modificado en los últimos 30 segundos
+        resource_type, resource_id = object_.split(':', 1)
+        last_modified = await self.get_last_modified(resource_type, resource_id)
+        
+        if not last_modified:
+            return False
+            
+        return last_modified > datetime.now() - timedelta(seconds=self.cache_ttl)
+    
+    async def get_last_modified(self, resource_type: str, resource_id: str) -> Optional[datetime]:
+        if resource_type != 'document':
+            return None
+            
+        async with AsyncSessionLocal() as session:
+            try:
+                query = select(DocumentDB.updated_at).where(DocumentDB.id == resource_id)
+                result = await session.execute(query)
+                updated_at = result.scalar()
+                return updated_at
+            except Exception as e:
+                print(f"Error getting last modified time: {e}")
+                return None
+            
 openfga_client = OpenFGAClient()

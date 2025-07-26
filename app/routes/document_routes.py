@@ -29,10 +29,17 @@ async def list_documents(
     
     # Execute query only for accessible documents
     result = await db.execute(query)
+<<<<<<< HEAD
 
     documents = result.scalars().all()
 
     docs_by_id = {doc.id: doc for doc in documents}
+=======
+    documents = result.scalars().all()
+
+    docs_by_id = {doc.id: doc for doc in documents}
+
+>>>>>>> 03a55aa (04_03)
     # Filter documents based on permissions
     return [docs_by_id[doc_id] for doc_id in accessible_document_ids if doc_id in docs_by_id]
 
@@ -284,3 +291,5 @@ async def check_document_permissions(
     )
     
     return permissions
+
+
