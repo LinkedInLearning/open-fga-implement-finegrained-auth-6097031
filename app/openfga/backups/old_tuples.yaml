@@ -1,0 +1,10 @@
+# Old tuples 
+- user: user:carla
+  relation: editor
+  object: document:roadmap
+- user: user:charlie
+  relation: editor
+  object: document:roadmap
+- user: user:diana
+  relation: editor
+  object: document:roadmap

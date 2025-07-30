@@ -34,12 +34,15 @@ model: |
       define organization: [organization]
       define parent: [folder]
       define owner: [user]
-      define editor: [user] or editor from parent
       define viewer: [user, user:*, user with temporal_access] or viewer from parent
+
+      # Permisos backwards compatibles
+      define editor: [user] or editor from parent
+      define writer: [user] or editor or editor from parent
+      define can_write: writer or owner or can_manage_content from organization
+      define can_edit: writer or owner or can_manage_content from organization
       
-      # Permisos simplificados y más claros
-      define can_read: viewer or editor or owner or can_manage_content from organization
-      define can_write: editor or owner or can_manage_content from organization
+      define can_read: viewer or writer or owner or can_manage_content from organization
       define can_delete: owner or admin from organization
 
   condition temporal_access(grant_time: timestamp, grant_duration: duration, current_time: timestamp) {
@@ -104,6 +107,19 @@ tuples:
   - user: folder:project-files
     relation: parent
     object: document:new-project-doc # alice tiene acceso a este documento porque es editor de la carpeta
+  - user: user:carla
+    relation: editor
+    object: document:project-plan
+  - user: user:chris
+    relation: editor
+    object: document:project-plan
+# nuevas relaciones para el nuevo modelos
+  - user: user:dasha
+    relation: writer
+    object: document:project-plan
+  - user: user:felipe
+    relation: writer
+    object: document:project-plan
 
 tests:
   - check:
@@ -192,3 +208,24 @@ tests:
         can_read: true
         can_write: true
         can_delete: false
+  - name: "Test de backwards compatible"
+    check:
+    - user: user:carla
+      object: document:project-plan
+      assertions:
+        can_write: true
+        can_edit: true
+  - name: "Test de backwards compatible"
+    check:
+    - user: user:chris
+      object: document:project-plan
+      assertions:
+        can_write: true
+        can_edit: true
+  - name: "Test de backwards compatible"
+    check:
+    - user: user:dasha
+      object: document:project-plan
+      assertions:
+        can_write: true
+        can_edit: true

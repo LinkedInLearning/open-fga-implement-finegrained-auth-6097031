@@ -1,0 +1,10 @@
+# new tuples 
+- user: user:carla
+  relation: writer
+  object: document:roadmap
+- user: user:charlie
+  relation: writer
+  object: document:roadmap
+- user: user:diana
+  relation: writer
+  object: document:roadmap
