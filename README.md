@@ -1,8 +1,16 @@
+<<<<<<< HEAD
 # OpenFGA: Implementación de Fine-Grained Authorization		
 
 Este es el repositorio del curso de LinkedIn Learning `[OpenFGA: Implementación de Fine-Grained Authorization]`. El curso completo está disponible en [LinkedIn Learning][lil-course-url].
 
 ![OpenFGA: Implementación de Fine-Grained Authorization][lil-thumbnail-url] 
+=======
+# Nombre final del curso
+
+Este es el repositorio del curso de LinkedIn Learning `[nombre del curso]`. El curso completo está disponible en [LinkedIn Learning][lil-course-url].
+
+![Nombre completo del curso][lil-thumbnail-url] 
+>>>>>>> 7ea18ad (Update README.md)
 
 Consulta el archivo Readme en la rama main para obtener instrucciones e información actualizadas.
 
@@ -139,3 +147,4 @@ Echa un vistazo a mis otros cursos en [LinkedIn Learning](https://www.linkedin.c
 [lil-thumbnail-url]: https://media.licdn.com/dms/image/v2/D4E0DAQG0eDHsyOSqTA/learning-public-crop_675_1200/B4EZVdqqdwHUAY-/0/1741033220778?e=2147483647&v=beta&t=FxUDo6FA8W8CiFROwqfZKL_mzQhYx9loYLfjN-LNjgA
 
 [1]: # (End of ES-Instruction ###############################################################################################)
+	
