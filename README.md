@@ -4,6 +4,8 @@ Este es el repositorio del curso de LinkedIn Learning `[OpenFGA: Implementación
 
 ![OpenFGA: Implementación de Fine-Grained Authorization][lil-thumbnail-url] 
 
+Domina la autorización detallada implementando OpenFGA en tus proyectos. Con este curso entiendes cómo modelar permisos granulares, definir roles y gestionar relaciones dinámicas de forma eficiente. Aprende a configurar OpenFGA localmente, usar su línea de comandos y el SDK para integrar políticas sólidas en tu aplicación. Explora técnicas para verificar accesos, optimizar consultas y manejar autorizaciones jerárquicas. Además, descubre buenas prácticas para garantizar rendimiento, consistencia y alta disponibilidad, logrando una solución de autorización escalable y segura.
+
 Consulta el archivo Readme en la rama main para obtener instrucciones e información actualizadas.
 
 OpenFGA (Fine-Grained Authorization) es una solución de código abierto para la autorización granular inspirada en el sistema Zanzibar de Google. Resuelve uno de los problemas más complejos en aplicaciones modernas: cómo determinar qué usuarios pueden realizar qué acciones sobre qué recursos.
@@ -119,8 +121,8 @@ Las ramas están estructuradas para corresponder a los vídeos del curso. La con
 Echa un vistazo a mis otros cursos en [LinkedIn Learning](https://www.linkedin.com/learning/instructors/carla-urrea-stabile).
 
 [0]: # (Replace these placeholder URLs with actual course URLs)
-[lil-course-url]: https://www.linkedin.com
-[lil-thumbnail-url]: https://media.licdn.com/dms/image/v2/D4E0DAQG0eDHsyOSqTA/learning-public-crop_675_1200/B4EZVdqqdwHUAY-/0/1741033220778?e=2147483647&v=beta&t=FxUDo6FA8W8CiFROwqfZKL_mzQhYx9loYLfjN-LNjgA
+[lil-course-url]: https://www.linkedin.com/learning/openfga-implementacion-de-fine-grained-authorization
+[lil-thumbnail-url]: https://media.licdn.com/dms/image/v2/D4E0DAQHXDdFv5CfHVA/learning-public-crop_675_1200/B4EZmfvPnnIMAc-/0/1759321586463?e=2147483647&v=beta&t=ml2D8-GQVM1_t0C3M1xzA0WkGJ6FzaeBN8k7wmKuGSo
 
 [1]: # (End of ES-Instruction ###############################################################################################)
 	
