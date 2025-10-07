@@ -5,7 +5,66 @@ Licensed under the LinkedIn Learning Exercise File License (the "License").
 See LICENSE in the project root for license information.
 
 ATTRIBUTIONS:
-[PLEASE PROVIDE ATTRIBUTIONS OR DELETE THIS AND THE ABOVE LINE “ATTRIBUTIONS”]
+
+python-dotenv
+[https://github.com/theskumar/python-dotenv](https://github.com/theskumar/python-dotenv)
+License: BSD-3-Clause
+[https://opensource.org/licenses/BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause). ([GitHub][1])
+-----------------------------------------------------------------------------------------------------------
+
+SQLAlchemy
+[https://github.com/sqlalchemy/sqlalchemy](https://github.com/sqlalchemy/sqlalchemy)
+License: MIT
+[https://opensource.org/licenses/MIT](https://opensource.org/licenses/MIT). ([GitHub][2])
+-----------------------------------------------------------------------------------------
+
+Pydantic
+[https://github.com/pydantic/pydantic](https://github.com/pydantic/pydantic)
+License: MIT
+[https://opensource.org/licenses/MIT](https://opensource.org/licenses/MIT). ([docs.pydantic.dev][3])
+----------------------------------------------------------------------------------------------------
+
+openfga-sdk (Python)
+[https://github.com/openfga/python-sdk](https://github.com/openfga/python-sdk)
+License: Apache 2.0
+[http://www.apache.org/licenses/](http://www.apache.org/licenses/). ([GitHub][4])
+---------------------------------------------------------------------------------
+
+Alembic
+[https://github.com/sqlalchemy/alembic](https://github.com/sqlalchemy/alembic)
+License: MIT
+[https://opensource.org/licenses/MIT](https://opensource.org/licenses/MIT). ([GitHub][5])
+-----------------------------------------------------------------------------------------
+
+python-multipart
+[https://github.com/Kludex/python-multipart](https://github.com/Kludex/python-multipart)
+License: Apache 2.0
+[http://www.apache.org/licenses/](http://www.apache.org/licenses/). ([GitHub][6])
+---------------------------------------------------------------------------------
+
+pydantic-settings
+[https://github.com/pydantic/pydantic-settings](https://github.com/pydantic/pydantic-settings)
+License: MIT
+[https://opensource.org/licenses/MIT](https://opensource.org/licenses/MIT). ([GitHub][7])
+-----------------------------------------------------------------------------------------
+
+Uvicorn
+[https://github.com/encode/uvicorn](https://github.com/encode/uvicorn)
+License: BSD-3-Clause
+[https://opensource.org/licenses/BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause). ([Anaconda][8])
+-------------------------------------------------------------------------------------------------------------
+
+aiosqlite
+[https://github.com/omnilib/aiosqlite](https://github.com/omnilib/aiosqlite)
+License: MIT
+[https://opensource.org/licenses/MIT](https://opensource.org/licenses/MIT). ([GitHub][9])
+-----------------------------------------------------------------------------------------
+
+FastAPI
+[https://github.com/fastapi/fastapi](https://github.com/fastapi/fastapi)
+License: MIT
+[https://opensource.org/licenses/MIT](https://opensource.org/licenses/MIT). ([GitHub][10])
+------------------------------------------------------------------------------------------
 
 Please note, this project may automatically load third party code from external 
 repositories (for example, NPM modules, Composer packages, or other dependencies). 
