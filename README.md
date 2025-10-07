@@ -4,8 +4,6 @@ Este es el repositorio del curso de LinkedIn Learning `[OpenFGA: Implementación
 
 ![OpenFGA: Implementación de Fine-Grained Authorization][lil-thumbnail-url] 
 
-Domina la autorización detallada implementando OpenFGA en tus proyectos. Con este curso entiendes cómo modelar permisos granulares, definir roles y gestionar relaciones dinámicas de forma eficiente. Aprende a configurar OpenFGA localmente, usar su línea de comandos y el SDK para integrar políticas sólidas en tu aplicación. Explora técnicas para verificar accesos, optimizar consultas y manejar autorizaciones jerárquicas. Además, descubre buenas prácticas para garantizar rendimiento, consistencia y alta disponibilidad, logrando una solución de autorización escalable y segura.
-
 Consulta el archivo Readme en la rama main para obtener instrucciones e información actualizadas.
 
 OpenFGA (Fine-Grained Authorization) es una solución de código abierto para la autorización granular inspirada en el sistema Zanzibar de Google. Resuelve uno de los problemas más complejos en aplicaciones modernas: cómo determinar qué usuarios pueden realizar qué acciones sobre qué recursos.
